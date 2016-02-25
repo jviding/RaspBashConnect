@@ -30,7 +30,7 @@ $ nano raspi
 Copy the following lines into it:<br>
 $ #!/bin/bash<br>
 $ #Go to project folder<br>
-$ cd /home/<username>/bin/RaspBashConnect  <-- Path to project root<br>
+$ cd /home/USERNAME/bin/RaspBashConnect  <-- Path to project root<br>
 $ #Launch app<br>
 $ ./start.sh<br>
 
