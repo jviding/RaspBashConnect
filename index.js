@@ -9,22 +9,24 @@ var url = 'http://cloud.mrjasu.com/api';
 var name = secret.username;
 var psw = secret.password;
 
-console.log(name+"\n"+psw);
-
+console.log('Fetching IP...');
 getIp(function (item) {
 	if (item.success) {
+		console.log('Received '+item.ip);
+		console.log('Starting SSH connection...');
 		ipReceived(item);
 	} else {
 		console.log('Token expired...\nGenerating a new token.')
 		authenticate(function (auth) {
 			if (!auth.success) {
-				console.log('Failed to authenticate on JasuCloud.');
+				console.log('JasuCloud authentication failed.');
 			} else {
 				console.log('Authentication successful.');
 				getIp(function (ip) {
-					if (ip.success) {
+					if (ip.success == false) {
 						console.log('IP-service unavailable.');
 					} else {
+						console.log('Starting SSH connection...');
 						ipReceived(ip);
 					}
 				});
@@ -34,8 +36,9 @@ getIp(function (item) {
 });
 
 function ipReceived(item) {
-	console.log('writing...'+item.ip);
-	writeToFile(ipFile, item.ip);
+	writeToFile(ipFile, item.ip, function () {
+		process.exit();
+	});
 };
 
 function getIp (callback) {
@@ -62,14 +65,17 @@ function authenticate (callback) {
 	}, function (err, httpResponse, body) {
 		    if (err) throw err;
 		    var res = JSON.parse(httpResponse.body);
-		    writeToFile(tokenFile, res.token);
+		    writeToFile(tokenFile, res.token, null);
 		    callback(res);
 	});
 };
 
-function writeToFile (file, txt) {
+function writeToFile (file, txt, callback) {
 	fs.writeFile(file, txt, function (err) {
 		if (err) throw err;
+		if (callback != null) {
+			callback;
+		}
 	});
 };
 
